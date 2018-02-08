@@ -4,21 +4,51 @@
     </head>
     <body>
     <form id="uploadForm">
-        <input type="file" name="userPhoto" multiple />
+        <input type="file" name="userPhoto" id="userPhoto" multiple />
         <input type="button" id="submit" value="Upload Image">
-        <input type="text" id="random" name="random"><br>
-        <span id="status"></span>
+        <div id="progressNumber"></div>
+        <div id="status"></div>
     </form>
     <script>
+        function uploadProgress(evt) {
+            if (evt.lengthComputable) {
+                var percentComplete = Math.round(evt.loaded * 100 / evt.total);
+                document.getElementById('progressNumber').innerHTML = 'Progress: ' + percentComplete.toString() + '%';
+            }
+            else {
+                document.getElementById('progressNumber').innerHTML = 'unable to compute';
+            }
+        }
+
+        function uploadComplete(evt) {
+            document.getElementById('status').innerText = evt.target.response.message;
+        }
+
+        function uploadFailed(evt) {
+            document.getElementById('status').innerText = 'There was an error attempting to upload the file.';
+        }
+
+        function uploadCanceled(evt) {
+            document.getElementById('status').innerText = 'The upload has been canceled by the user or the browser dropped the connection.';
+        }
+
         document.getElementById('submit').onclick = function() {
-            fetch('/api/photo', {
-                method: 'POST',
-                body: new FormData(document.forms.uploadForm),
-            }).then((response) => response.json()).then((data) => {
-                document.getElementById('status').innerText = data.message;
-            }).catch(function (ex) {
-                console.error('parsing failed', ex);
-            });
+            if (document.getElementById('userPhoto').files.length > 0) {
+                var fd = new FormData(document.forms.uploadForm);
+                var xhr = new XMLHttpRequest();
+                xhr.upload.addEventListener("progress", uploadProgress, false);
+                xhr.addEventListener("load", uploadComplete, false);
+                xhr.addEventListener("error", uploadFailed, false);
+                xhr.addEventListener("abort", uploadCanceled, false);
+                xhr.open("POST", "/api/photo");
+                xhr.responseType = 'json';
+                xhr.send(fd);
+            }
+        }
+
+        document.getElementById('userPhoto').onchange = function () {
+            document.getElementById('progressNumber').innerHTML = '';
+            document.getElementById('status').innerHTML = '';
         }
     </script>
   </body>

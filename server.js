@@ -20,9 +20,9 @@ app.get('/',function(req,res){
 app.post('/api/photo',function(req,res){
     upload(req,res,function(err) {
         if(err) {
-            return res.status(500).json({message: "Error uploading file."});
+            return res.status(500).json({message: "Error uploading file(s)."});
         }
-        res.json({message: "File is uploaded"});
+        res.json({message: "File(s) uploaded."});
     });
 });
 

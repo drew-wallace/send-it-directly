@@ -5,10 +5,5 @@
     "body-parser": "^1.14.2",
     "express": "4.13.3",
     "multer": "1.1.0"
-  },
-  "devDependencies": {
-    "should": "~7.1.0",
-    "mocha": "~2.3.3",
-    "supertest": "~1.1.0"
   }
 }
